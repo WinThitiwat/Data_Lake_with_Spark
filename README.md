@@ -32,9 +32,7 @@ Sample Log Data:
 - Song data: `s3a://udacity-dend/song-data/`
 - Log data: `s3a://udacity-dend/log-data/`
 
-2. Process data using Spark
-
-Process data and transform into 5 different tables as followed:
+2. Process data using Spark and transform into 5 different tables as followed:
 ### Fact table:
 - `songplays` - records in log data associated with song plays i.e. records with page `NextSong`
   
@@ -66,9 +64,7 @@ Process data and transform into 5 different tables as followed:
   ts, start_time, hour, day, week, month, year, weekday
   ```
   
-3. Load processed data back to data lake resides in S3
-
-Write all processed data into parquet files with that reside in S3 data lake. Following tables are saved as partitioned parquet file, which partitioned by `year` and `month`
+3. Load processed data back to data lake resides in S3 by writing data into parquet files. Following tables are saved as partitioned parquet file, which partitioned by `year` and `month`
 ```
 songs, time, songplays
 ```
@@ -110,6 +106,7 @@ spark-submit etl.py --master yarn --deploy-mode client --driver-memory 4g --num-
 ```
 
 ## **Project Files**
+- `data` - a small data source in local for data profiling and testing
 - `data_profiling.ipynb` - a Python notebook for data profiling to examine and summarize the data source before the actual pipeline implementation
 - `etl.py` - a Python file implementing the actual ETL data pipeline process for all datasets
 - `requirements.txt` - a text file containing all mandatory dependencies for the project
