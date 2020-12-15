@@ -27,15 +27,55 @@ Sample Log Data:
 {"artist":"Des'ree","auth":"Logged In","firstName":"Kaylee","gender":"F","itemInSession":1,"lastName":"Summers","length":246.30812,"level":"free","location":"Phoenix-Mesa-Scottsdale, AZ","method":"PUT","page":"NextSong","registration":1540344794796.0,"sessionId":139,"song":"You Gotta Be","status":200,"ts":1541106106796,"userAgent":"\"Mozilla\/5.0 (Windows NT 6.1; WOW64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/35.0.1916.153 Safari\/537.36\"","userId":"8"}
 ```
 
-# ETL Pipeline Process
-1. Load data from S3
+## ETL Pipeline Process
+1. Load data from S3. Note that S3 bucket needs to be added into the config file. Check out [Setup Configurations File](#setup-configurations-file)
+- Song data: `s3a://udacity-dend/song-data/`
+- Log data: `s3a://udacity-dend/log-data/`
 
 2. Process data using Spark
 
+Process data and transform into 5 different tables as followed:
+### Fact table:
+- `songplays` - records in log data associated with song plays i.e. records with page `NextSong`
+  
+  ```
+  songplay_id, start_time, userId, level, song_id, artist_id, session_id, location, userAgent, month, year
+  ```
+### Dimension tables:
+- `users` - users in the app
+
+  ```
+  userId, firstName, lastName, gender, level
+  ```
+  
+- `songs` - songs in music database
+  
+  ```
+  song_id, title, artist_id, year, duration
+  ```
+  
+- `artists` - artists in music database
+  
+  ```
+  artist_id, name, location, latitude, longitude
+  ```
+  
+- `time` - timestamps of records in <strong>songplays</strong> broken down into specific units
+  
+  ```
+  ts, start_time, hour, day, week, month, year, weekday
+  ```
+  
 3. Load processed data back to data lake resides in S3
 
+Write all processed data into parquet files with that reside in S3 data lake. Following tables are saved as partitioned parquet file, which partitioned by `year` and `month`
+```
+songs, time, songplays
+```
+The S3 bucket can be designated in [Setup Configurations File]((#setup-configurations-file))
 
-# Setup Configurations File at the Root Project - `dl.config`
+## **Setup Configurations File**
+At the Root Project, create a config file named `dl.config` with following configuration.
 
     [AWS] # AWS IAM Credential
     AWS_ACCESS_KEY_ID=<iam_access_key_id>
@@ -44,4 +84,37 @@ Sample Log Data:
     [S3]
     INPUT_DATA=s3a://udacity-dend/
     OUTPUT_DATA=s3://<your_s3_bucket>/data_outputs/
-  
+ 
+## How to run
+This project is run on Spark cluster that was set up on Amazon EMR with follow setup
+    
+    --use-default-roles  
+    --release-label emr-5.32.0 
+    --instance-count 2 
+    --applications Name=Spark 
+    --bootstrap-actions Path="s3://<your_S3_bucket>/path/to/bootstrap_emr.sh" 
+    --ec2-attributes KeyName=spark-cluster 
+    --instance-type m5.xlarge 
+    --instance-count 3 
+
+Note:
+1. Make sure that the file to be run is in your Spark cluster. In case the development environment is on your laptop local, then you need to move the file into your Spark edge node using SSH.
+```
+ssh -i <key_pair_pem_file.pem> <local_file_path i.e. etl.py> hadoop@<EMR_MasterNode_endpoint>:~/<path_location>
+```
+2. Make sure that your EMR DefaultRole has S3 access policy attached.
+
+After the file, and your EMR are ready state, then kick off the Spark job.
+```
+spark-submit etl.py --master yarn --deploy-mode client --driver-memory 4g --num-executors 2 --executor-memory 2g --executor-core 2
+```
+
+## **Project Files**
+- `data_profiling.ipynb` - a Python notebook for data profiling to examine and summarize the data source before the actual pipeline implementation
+- `etl.py` - a Python file implementing the actual ETL data pipeline process for all datasets
+- `requirements.txt` - a text file containing all mandatory dependencies for the project
+
+
+## **Project Author**
+- Author: Thitiwat Watanajaturaporn 
+- Note: this project is part of Udacity's Data Engineering Nanodegree Program.
