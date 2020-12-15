@@ -36,11 +36,12 @@ Sample Log Data:
 
 
 # Setup Configurations File at the Root Project - `dl.config`
-  [AWS]
-  AWS_ACCESS_KEY_ID=<iam_access_key_id>
-  AWS_SECRET_ACCESS_KEY=<iam_secret_access_key>
 
-  [S3]
-  INPUT_DATA=s3a://udacity-dend/
-  OUTPUT_DATA=s3://<your_s3_bucket>/data_outputs/
+    [AWS] # AWS IAM Credential
+    AWS_ACCESS_KEY_ID=<iam_access_key_id>
+    AWS_SECRET_ACCESS_KEY=<iam_secret_access_key>
+  
+    [S3]
+    INPUT_DATA=s3a://udacity-dend/
+    OUTPUT_DATA=s3://<your_s3_bucket>/data_outputs/
   
