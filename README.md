@@ -10,6 +10,9 @@ As their data engineer, you are tasked with building an ETL pipeline that extrac
 - Process the data into analytics tables using Spark (Amazon EMR Spark)
 - Load data back into S3 as parquet files
 
+# System Architecture
+![alt text](https://github.com/WinThitiwat/Data_Lake_with_Spark/blob/main/system_architecture.png)
+
 ## **Datasets**
 
 ### **Song Data**
